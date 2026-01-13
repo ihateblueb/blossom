@@ -10,4 +10,7 @@ Currently, OrchidCore has the following implemented:
 - msg (Privately message other players)
 - reply (Reply to last person who messaged you)
 
-More is coming soon
+More is coming soon, including:
+
+- Discord bridge
+- dback (return to location of last death)
