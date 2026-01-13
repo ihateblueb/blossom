@@ -6,23 +6,29 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes
 import com.hypixel.hytale.server.core.universe.PlayerRef
 import site.remlit.orchidcore.exception.GracefulException
-import site.remlit.orchidcore.service.TpaService
+import site.remlit.orchidcore.service.MsgService
 import site.remlit.orchidcore.util.sendMessage
 import java.util.concurrent.CompletableFuture
 
-class TpaCommand : AbstractCommand(
-    "tpask",
-    "Asks player if you can teleport to them"
+class MsgCommand : AbstractCommand(
+    "msg",
+    "Messages a player",
 ) {
     val targetPlayerArg: RequiredArg<PlayerRef> = withRequiredArg<PlayerRef>(
         "targetPlayer",
-        "Player to request to teleport to",
+        "Player to send message to",
         ArgTypes.PLAYER_REF
     )
 
+    val messageArg: RequiredArg<String> = withRequiredArg<String>(
+        "message",
+        "Message to send to player",
+        ArgTypes.STRING
+    )
+
     init {
-        this.requirePermission("orchidcore.command.tpask")
-        this.addAliases("tpa")
+        this.requirePermission("orchidcore.command.msg")
+        this.addAliases("whisper", "w")
     }
 
     override fun execute(ctx: CommandContext): CompletableFuture<Void> =
@@ -34,11 +40,10 @@ class TpaCommand : AbstractCommand(
 
             val target = targetPlayerArg.get(ctx)
             val sender = ctx.sender()
+            val msg = messageArg.get(ctx)
 
             try {
-                TpaService.appendTpa(target.uuid, sender.uuid)
-                ctx.sendMessage("Sending request to teleport to ${target.username}." +
-                        " It will expire in 30 seconds.")
+                MsgService.send(sender.uuid, target.uuid, msg)
             } catch (e: GracefulException) {
                 ctx.sendMessage(e.message ?: "Command failed")
             }

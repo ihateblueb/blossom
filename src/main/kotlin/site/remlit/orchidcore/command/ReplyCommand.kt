@@ -4,25 +4,24 @@ import com.hypixel.hytale.server.core.command.system.AbstractCommand
 import com.hypixel.hytale.server.core.command.system.CommandContext
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes
-import com.hypixel.hytale.server.core.universe.PlayerRef
 import site.remlit.orchidcore.exception.GracefulException
-import site.remlit.orchidcore.service.TpaService
+import site.remlit.orchidcore.service.MsgService
 import site.remlit.orchidcore.util.sendMessage
 import java.util.concurrent.CompletableFuture
 
-class TpaCommand : AbstractCommand(
-    "tpask",
-    "Asks player if you can teleport to them"
+class ReplyCommand : AbstractCommand(
+    "reply",
+    "Reply to the last player you messaged",
 ) {
-    val targetPlayerArg: RequiredArg<PlayerRef> = withRequiredArg<PlayerRef>(
-        "targetPlayer",
-        "Player to request to teleport to",
-        ArgTypes.PLAYER_REF
+    val messageArg: RequiredArg<String> = withRequiredArg<String>(
+        "message",
+        "Message to send to player",
+        ArgTypes.STRING
     )
 
     init {
-        this.requirePermission("orchidcore.command.tpask")
-        this.addAliases("tpa")
+        this.requirePermission("orchidcore.command.reply")
+        this.addAliases("r")
     }
 
     override fun execute(ctx: CommandContext): CompletableFuture<Void> =
@@ -32,13 +31,11 @@ class TpaCommand : AbstractCommand(
                 return@runAsync
             }
 
-            val target = targetPlayerArg.get(ctx)
             val sender = ctx.sender()
+            val msg = messageArg.get(ctx)
 
             try {
-                TpaService.appendTpa(target.uuid, sender.uuid)
-                ctx.sendMessage("Sending request to teleport to ${target.username}." +
-                        " It will expire in 30 seconds.")
+                MsgService.reply(sender.uuid, msg)
             } catch (e: GracefulException) {
                 ctx.sendMessage(e.message ?: "Command failed")
             }
