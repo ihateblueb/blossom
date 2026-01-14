@@ -7,6 +7,8 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes
 import com.hypixel.hytale.server.core.universe.PlayerRef
 import site.remlit.orchidcore.exception.GracefulException
 import site.remlit.orchidcore.service.MsgService
+import site.remlit.orchidcore.util.red
+import site.remlit.orchidcore.util.runCommand
 import site.remlit.orchidcore.util.sendMessage
 import java.util.concurrent.CompletableFuture
 
@@ -32,20 +34,12 @@ class MsgCommand : AbstractCommand(
     }
 
     override fun execute(ctx: CommandContext): CompletableFuture<Void> =
-        CompletableFuture.runAsync {
+        runCommand(ctx) {
             if (!ctx.isPlayer) {
                 ctx.sendMessage("Only players can issue this command")
-                return@runAsync
+                return@runCommand
             }
 
-            val target = targetPlayerArg.get(ctx)
-            val sender = ctx.sender()
-            val msg = messageArg.get(ctx)
-
-            try {
-                MsgService.send(sender.uuid, target.uuid, msg)
-            } catch (e: GracefulException) {
-                ctx.sendMessage(e.message ?: "Command failed")
-            }
+            MsgService.send(ctx.sender().uuid, targetPlayerArg.get(ctx).uuid, messageArg.get(ctx))
         }
 }

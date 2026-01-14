@@ -4,6 +4,8 @@ import com.hypixel.hytale.server.core.command.system.AbstractCommand
 import com.hypixel.hytale.server.core.command.system.CommandContext
 import site.remlit.orchidcore.exception.GracefulException
 import site.remlit.orchidcore.service.TpaService
+import site.remlit.orchidcore.util.red
+import site.remlit.orchidcore.util.runCommand
 import site.remlit.orchidcore.util.sendMessage
 import java.util.concurrent.CompletableFuture
 
@@ -17,16 +19,12 @@ class TpacceptCommand : AbstractCommand(
     }
 
     override fun execute(ctx: CommandContext): CompletableFuture<Void> =
-        CompletableFuture.runAsync {
+        runCommand(ctx) {
             if (!ctx.isPlayer) {
                 ctx.sendMessage("Only players can issue this command")
-                return@runAsync
+                return@runCommand
             }
 
-            try {
-                TpaService.acceptTpa(ctx.sender().uuid)
-            } catch (e: GracefulException) {
-                ctx.sendMessage(e.message ?: "Command failed")
-            }
+            TpaService.acceptTpa(ctx.sender().uuid)
         }
 }

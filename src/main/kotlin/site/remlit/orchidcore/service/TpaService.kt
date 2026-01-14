@@ -9,7 +9,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import site.remlit.orchidcore.Coroutines
+import site.remlit.orchidcore.Main
 import site.remlit.orchidcore.exception.GracefulException
+import site.remlit.orchidcore.util.gold
+import site.remlit.orchidcore.util.red
 import site.remlit.orchidcore.util.sendMessage
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
@@ -42,19 +45,18 @@ object TpaService {
         val sender = Universe.get().players.first { it.uuid == from }
         val target = Universe.get().players.first { it.uuid == to }
 
-        if (sender.worldUuid != target.worldUuid)
-            throw GracefulException("You are not in the same world")
+        val expireTime = Main.config.tpask.expireTime
 
-        sender.sendMessage("${sender.username} has requested to teleport to you. You can accept with /tpaccept." +
-                " This will expire in 30 seconds.")
+        target.sendMessage(gold { "${sender.username} has requested to teleport to you. You can accept with /tpaccept." +
+                " This will expire in $expireTime seconds." })
 
         Coroutines.sharedScope.launch {
-            delay(30.seconds)
+            delay(expireTime.seconds)
             if (pendingTpas.contains(from)) {
                 pendingTpas.remove(from)
 
-                sender.sendMessage("Teleportation request to ${target.username} expired.")
-                target.sendMessage("Teleportation request from ${sender.username} expired.")
+                sender.sendMessage(red { "Teleportation request to ${target.username} expired." })
+                target.sendMessage(red { "Teleportation request from ${sender.username} expired." })
             }
         }
     }
@@ -68,15 +70,17 @@ object TpaService {
                 val sender = Universe.get().players.first { it.uuid == k }
                 val target = Universe.get().players.first { it.uuid == v }
 
-                sender.sendMessage("${sender.username} accepted your teleportation request, you'll be teleported" +
-                        " in 3 seconds.")
-                target.sendMessage("Teleporting ${sender.username} to you.")
+                val waitTime = Main.config.tpask.teleportWait
+
+                sender.sendMessage(gold { "${sender.username} accepted your teleportation request, you'll be teleported" +
+                        " in $waitTime seconds." })
+                target.sendMessage(gold { "Teleporting ${sender.username} to you." })
 
                 val targetWorld = Universe.get().getWorld(target.worldUuid ?: throw GracefulException("Something went wrong"))
                     ?: throw GracefulException("Something went wrong")
 
                 Coroutines.sharedScope.launch {
-                    delay(3.seconds)
+                    delay(waitTime.seconds)
                     sender.updatePosition(targetWorld, target.transform, sender.headRotation)
                 }
 
@@ -93,8 +97,8 @@ object TpaService {
                 val sender = Universe.get().players.first { it.uuid == k }
                 val target = Universe.get().players.first { it.uuid == v }
 
-                sender.sendMessage("${sender.username} denied your teleportation request.")
-                target.sendMessage("Denied teleportation request from ${sender.username}.")
+                sender.sendMessage(red { "${sender.username} denied your teleportation request." })
+                target.sendMessage(gold { "Denied teleportation request from ${sender.username}." })
 
                 pendingTpas.remove(k, v)
             }

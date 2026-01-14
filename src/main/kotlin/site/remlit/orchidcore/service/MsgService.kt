@@ -4,7 +4,10 @@ import com.hypixel.hytale.server.core.universe.Universe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import site.remlit.orchidcore.Coroutines
+import site.remlit.orchidcore.Main
 import site.remlit.orchidcore.exception.GracefulException
+import site.remlit.orchidcore.util.gray
+import site.remlit.orchidcore.util.msg
 import site.remlit.orchidcore.util.sendMessage
 import java.util.UUID
 import kotlin.time.Clock
@@ -25,6 +28,7 @@ object MsgService {
     val conversations = mutableListOf<Conversation>()
 
     fun startCleaner() {
+        Main.logger.atInfo().log("Started message cleaner")
         Coroutines.sharedScope.launch {
             delay(5.seconds)
             conversations.filter { it.updatedAt < (Clock.System.now().minus(5.minutes)) }
@@ -43,8 +47,8 @@ object MsgService {
             it.updatedAt = Clock.System.now()
         }
 
-        target.sendMessage("${sender.username} whispers: $msg")
-        sender.sendMessage("You whisper to ${target.username}: $msg")
+        target.sendMessage(gray { "${sender.username} whispers: $msg" })
+        sender.sendMessage(gray { "You whisper to ${target.username}: $msg" })
     }
 
     fun reply(from: UUID, msg: String) {
