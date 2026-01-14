@@ -3,6 +3,8 @@
 A (work in progress) Hytale mod for essential player & admin utilities, written by a real person and
 not a LLM.
 
+This mod is not yet stable, and is going to be renamed soon.
+
 Currently, OrchidCore has the following implemented:
 
 - tpask (ask to teleport to another player, who can then accept or deny)
@@ -19,7 +21,14 @@ Currently, OrchidCore has the following implemented:
 More is coming soon, including:
 
 - Chat formatting
+- Improved join server messages
+- Per-user cusrom join messages
+- User-equipable chat prefixes called tags
 - Discord account linking
+- Giving Discord roles to players based on permissions
 - tpahere (Teleport another player to you)
-- dback (Return to location of last death)
+- tpcancel (Cancel all outgoing teleportation requests)
 - AFK system
+- Waypoint system
+  - Waypoints on the map and compass
+  - Potentially visuals for when someone teleports to a warp
