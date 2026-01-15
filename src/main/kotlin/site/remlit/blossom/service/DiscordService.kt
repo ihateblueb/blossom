@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import site.remlit.blossom.Main
 import site.remlit.blossom.exception.GracefulException
+import site.remlit.blossom.formatter.Formatter
+import site.remlit.blossom.formatter.Formatter.mergePlaceholders
+import site.remlit.blossom.formatter.Formatter.playerPlaceholders
 import site.remlit.blossom.util.sendMessage
 import java.util.EnumSet
 
@@ -24,12 +27,16 @@ object DiscordService {
             if (event.author.isBot)
                 return
 
-            Main.logger.atInfo().log("(Discord) ${event.author.name}: ${event.message.contentRaw}")
+            Main.logger.atInfo().log("(Discord) ${event.author.effectiveName}: ${event.message.contentRaw}")
 
             Universe.get().sendMessage(
-                Main.config.discord.discordToHytaleFormat
-                    .replace("%username%", event.author.name)
-                    .replace("%msg%", event.message.contentRaw)
+                Formatter.format(
+                    mapOf(
+                        "username" to event.author.effectiveName,
+                        "msg" to event.message.contentRaw
+                    ),
+                    Main.config.discord.discordToHytaleFormat
+                )
             )
         }
     }
@@ -60,23 +67,31 @@ object DiscordService {
 
             Universe.get().eventRegistry.registerGlobal(PlayerConnectEvent::class.java) { event ->
                 channel.sendMessage(
-                    Main.config.discord.joinFormat
-                        .replace("%username%", event.playerRef.username)
+                    Formatter.formatToString(
+                        playerPlaceholders(event.playerRef),
+                        Main.config.discord.joinFormat
+                    )
                 ).queue()
             }
 
             Universe.get().eventRegistry.registerGlobal(PlayerDisconnectEvent::class.java) { event ->
                 channel.sendMessage(
-                    Main.config.discord.leaveFormat
-                        .replace("%username%", event.playerRef.username)
+                    Formatter.formatToString(
+                        playerPlaceholders(event.playerRef),
+                        Main.config.discord.leaveFormat
+                    )
                 ).queue()
             }
 
             Universe.get().eventRegistry.registerGlobal(PlayerChatEvent::class.java) { event ->
                 channel.sendMessage(
-                    Main.config.discord.hytaleToDiscordFormat
-                        .replace("%username%", event.sender.username)
-                        .replace("%msg%", event.content)
+                    Formatter.formatToString(
+                        mergePlaceholders(
+                            playerPlaceholders(event.sender),
+                            mapOf("msg" to event.content)
+                        ),
+                        Main.config.discord.hytaleToDiscordFormat
+                    )
                 ).queue()
             }
 

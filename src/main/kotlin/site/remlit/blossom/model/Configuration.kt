@@ -5,15 +5,31 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Configuration(
     var version: Int = 0,
+    var formatting: FormattingConfiguration = FormattingConfiguration(),
     var chat: ChatConfiguration = ChatConfiguration(),
     var tpask: TpaskConfiguration = TpaskConfiguration(),
     var discord: DiscordConfiguration = DiscordConfiguration(),
 )
 
 @Serializable
+data class FormattingConfiguration(
+    var red: String = "#ff5d52",
+    var orange: String = "#ffb026",
+    var yellow: String = "#ffdf52",
+    var green: String = "#34d944",
+    var blue: String = "#7878ff",
+    var purple: String = "#8b61ff",
+    var pink: String = "#f872fc",
+    var gray: String = "#808080",
+    var darkgray: String = "#474747",
+)
+
+@Serializable
 data class ChatConfiguration(
     var enabled: Boolean = true,
-    var format: String = "%username%: %msg%",
+    var format: String = "<blue>%username%:</blue> %msg%",
+    var bannedWords: List<String> = emptyList(),
+    var bannedWordsRegex: List<String> = emptyList()
 )
 
 @Serializable

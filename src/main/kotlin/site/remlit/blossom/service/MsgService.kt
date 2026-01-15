@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import site.remlit.blossom.Coroutines
 import site.remlit.blossom.Main
 import site.remlit.blossom.exception.GracefulException
-import site.remlit.blossom.util.gray
+import site.remlit.blossom.util.sendMessage
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
@@ -45,8 +45,8 @@ object MsgService {
             it.updatedAt = Clock.System.now()
         }
 
-        target.sendMessage(gray { "${sender.username} whispers: $msg" })
-        sender.sendMessage(gray { "You whisper to ${target.username}: $msg" })
+        target.sendMessage("<gray>${sender.username} whispers: $msg")
+        sender.sendMessage("<gray>You whisper to ${target.username}: $msg")
     }
 
     fun reply(from: UUID, msg: String) {

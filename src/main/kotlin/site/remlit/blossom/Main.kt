@@ -19,25 +19,7 @@ class Main(init: JavaPluginInit) : JavaPlugin(init) {
         Companion.logger = this.logger
 
         val cfgTime = measureTimeMillis {
-            if (!configPath.parent.exists())
-                configPath.parent.createDirectories()
-
-            if (!configPath.exists()) {
-                configPath.createFile()
-            }
-
-            if (configPath.readText().isEmpty())
-                configPath.writeText(jsonConfig.encodeToString(Configuration()))
-
-            config = try {
-                jsonConfig.decodeFromString<Configuration>(configPath.readText())
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                logger.atWarning().log("Failed decoding configuration, using default. Some features may not work.")
-                Configuration()
-            }
-
-            ConfigService.upgrade()
+            ConfigService.load()
         }
 
         logger.atInfo().log("Loaded configuration in $cfgTime ms")
@@ -48,6 +30,7 @@ class Main(init: JavaPluginInit) : JavaPlugin(init) {
 
             commandRegistry.registerCommand(TpacceptCommand())
             commandRegistry.registerCommand(TpaCommand())
+            commandRegistry.registerCommand(TpahereCommand())
             commandRegistry.registerCommand(TpdenyCommand())
         }
 

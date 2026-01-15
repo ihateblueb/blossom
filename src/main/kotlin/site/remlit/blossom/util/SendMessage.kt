@@ -1,42 +1,18 @@
 package site.remlit.blossom.util
 
-import com.hypixel.hytale.server.core.Message
 import com.hypixel.hytale.server.core.command.system.CommandContext
 import com.hypixel.hytale.server.core.universe.PlayerRef
 import com.hypixel.hytale.server.core.universe.Universe
+import site.remlit.blossom.formatter.Formatter
 
 fun Universe.sendMessage(message: String) {
-    this.sendMessage(Message.raw(message))
+    this.sendMessage(Formatter.format(message))
 }
 
 fun CommandContext.sendMessage(message: String) {
-    this.sendMessage(Message.raw(message))
+    this.sendMessage(Formatter.format(message))
 }
 
 fun PlayerRef.sendMessage(message: String) {
-    this.sendMessage(Message.raw(message))
-}
-
-fun gray(string: () -> String): Message {
-    return Message.raw(string()).color("#808080")
-}
-
-fun darkGray(string: () -> String): Message {
-    return Message.raw(string()).color("#474747")
-}
-
-fun blue(string: () -> String): Message {
-    return Message.raw(string()).color("#7878ff")
-}
-
-fun gold(string: () -> String): Message {
-    return Message.raw(string()).color("#ffb026")
-}
-
-fun red(string: () -> String): Message {
-    return Message.raw(string()).color("#sff3b3b")
-}
-
-fun msg(vararg msg: Message): Message {
-    return Message.join(*msg)
+    this.sendMessage(Formatter.format(message))
 }
